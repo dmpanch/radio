@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+    radio:
+        build: .
+        ports:
+          - "6600:6600"
+          - "8000:8000"
+        volumes:
+          - /media/radio/dnb:/var/lib/mpd/music:rw
+          - /media/mpd/playlists:/var/lib/mpd/playlists:rw
+          - /media/mpd/database:/var/lib/mpd/database:rw
