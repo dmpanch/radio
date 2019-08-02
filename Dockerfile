@@ -3,30 +3,25 @@ MAINTAINER dmpanch
 
 ENV MPD_VERSION 0.21.10-r0
 ENV MPC_VERSION 0.32-r0
-ENV ICECAST_VERSION 2.4.4-r1
 ENV PYTHON_VERSION 3.7.3-r0
 
 # https://docs.docker.com/engine/reference/builder/#arg
 
-ARG user=root
-ARG group=root
-
 RUN apk -q update \
     && apk -q --no-progress add mpd="$MPD_VERSION" \
     && apk -q --no-progress add mpc="$MPC_VERSION" \
-    && apk -q --no-progress add icecast="$ICECAST_VERSION" \
     && rm -rf /var/cache/apk/*
 
 RUN mkdir -p /var/lib/mpd/music \
     && mkdir -p /var/lib/mpd/playlists \
     && mkdir -p /var/lib/mpd/database \
     && mkdir -p /var/log/mpd/mpd.log \
-    && chown -R ${user}:${group} /var/lib/mpd \
-    && chown -R ${user}:${group} /var/log/mpd/mpd.log \
+    && chown -R mpd:audio /var/lib/mpd \
+    && chown -R mpd:audio /var/log/mpd/mpd.log \
     && chmod -R 755 /var/lib/mpd
 
 # Declare a music , playlists and database volume (state, tag_cache and sticker.sql)
-VOLUME ["/var/lib/mpd/music", "/var/lib/mpd/playlists", "/var/lib/mpd/database"]
+VOLUME ["/var/lib/mpd"]
 
 # mpddj here
 
@@ -50,25 +45,19 @@ RUN git clone https://github.com/python-telegram-bot/python-telegram-bot --recur
 
 RUN git clone https://github.com/dmpanch/mpddj.git
 
-COPY icecast.xml /usr/share/icecast/icecast.xml
 COPY mpd.conf /etc/mpd.conf
 COPY config.py /mpddj/config.py
 COPY start.sh /start.sh
 
-RUN addgroup -S icecast2 && adduser -S icecast2 -G icecast2
-
-RUN mkdir -p /var/log/icecast \
-    && chown -R icecast2 /usr/share/icecast \
-    && chown -R icecast2 /var/log/icecast
-
-RUN chown -R ${user}:${group} /mpddj
+RUN chown -R root:root /mpddj
 RUN chmod -R 755 /mpddj
 RUN chmod -R 755 start.sh
 
+RUN touch /var/lib/mpd/database/tag_cache \
+    && chown -R mpd:audio /var/lib/mpd/database/tag_cache
+
 # Entry point for mpc update and stuff
 EXPOSE 6600
-EXPOSE 8000
-
-#CMD icecast -c /usr/share/icecast/icecast.xml && python3 /mpddj/main.py && mpd --stdout --no-daemon
+EXPOSE 8001
 
 CMD ["/start.sh"]

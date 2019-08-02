@@ -2,10 +2,11 @@ version: '3'
 
 services:
     radio:
+        restart: always
         build: .
         ports:
           - "6600:6600"
-          - "8000:8000"
+          - "8001:8001"
         volumes:
           - /media/radio/dnb:/var/lib/mpd/music:rw
           - /media/mpd/playlists:/var/lib/mpd/playlists:rw
