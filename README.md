@@ -3,6 +3,10 @@ MPD + MPC + Telegram bot radio stack in Docker, depends on python-telegram-bot, 
 
 Before start change credentials for stream access in mpd.conf, and credentials for Telegram bot in config.py
 
+    'STREAM_URL' : 'stream_url', - set stream URL here, Telegram bot use it for /stream command
+    'TOKEN' : 'telegram_bot_token', - set Telegram bot token from Botfather
+    'SUPER_USER' : 'telegram_user', - set Telegram bot admin username
+
 Setcommands list example for BotFather:
 * add - Add song by full path
 * sample - Randomly list some songs
